@@ -44,6 +44,9 @@ namespace Core
         private Vector3 _rotateStartPosition;
         private Vector3 _rotateCurrentPosition;
 
+        // Target
+        [SerializeField] private Transform _playerTransform;
+
         private void Start()
         {
             _newPosition = transform.position;
@@ -110,6 +113,10 @@ namespace Core
 
         private void HandleMovementInput()
         {
+            // Center on player
+            if (Input.GetButton("CenterCameraOnPlayer"))
+                _newPosition = _playerTransform.position;
+
             // Fast or slow camera movement
             if (Input.GetButton("Fast"))
                 _movementSpeed = _fastSpeed;

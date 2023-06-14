@@ -2,7 +2,8 @@
     "name": "Terrain",
     "rootNamespace": "",
     "references": [
-        "GUID:dc91e0417ce679447ab60581a93c66bc"
+        "GUID:dc91e0417ce679447ab60581a93c66bc",
+        "GUID:51073154f0eca234c8f75dbee9a2c70c"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
