@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Core
@@ -9,8 +8,10 @@ namespace Core
     {
         TileSetup,
         PlayerSetup,
+        UISetup,
         WaitingPlayer,
-        Move,
+        SelectingMove,
+        Moving,
         Harvest,
         Build,
         Craft
@@ -19,29 +20,31 @@ namespace Core
     public class GameStateManager : MonoBehaviour
     {
         // Beginning with the map setup
-        private GameState _state = GameState.TileSetup;
+        [SerializeField] private static GameState _state = GameState.TileSetup;
 
         // If it's called with blank, just reset the state
         // If it's called with a state, set it
-        public void ChangeState(GameState state = GameState.WaitingPlayer)
+        public static void ChangeState(GameState state = GameState.WaitingPlayer)
         {
+            // TileSetup -> PlayerSetup -> UISetup -> WaitingPlayer
+
             if (_state == GameState.TileSetup)
-            {
                 _state = GameState.PlayerSetup;
-            }
+
+            else if (_state == GameState.PlayerSetup)
+                _state = GameState.UISetup;
+
             else
-            {
                 _state = state;
-            }
         }
 
         // Called from Buttons
-        public void ChangeState(ButtonState buttonState)
+        public static void ChangeState(ButtonState buttonState)
         {
             ChangeState(buttonState.state);
         }
 
-        public GameState GetState()
+        public static GameState GetState()
         {
             return _state;
         }

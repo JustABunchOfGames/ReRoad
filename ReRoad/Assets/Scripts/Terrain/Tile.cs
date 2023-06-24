@@ -1,3 +1,4 @@
+using Build;
 using Core;
 using Resources;
 using System.Collections.Generic;
@@ -45,6 +46,8 @@ namespace Terrain
 
         [Header("Inventory")]
         public Inventory inventory;
+
+        private Outpost _outpost;
 
         public void SetTileManager(TileManager manager)
         {
@@ -126,6 +129,11 @@ namespace Terrain
         public bool IsRevealed()
         {
             return !fow.gameObject.activeSelf;
+        }
+
+        public bool OutpostOnTile()
+        {
+            return _outpost != null;
         }
 
 

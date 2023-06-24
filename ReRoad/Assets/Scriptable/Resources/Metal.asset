@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: Metal
   m_EditorClassIdentifier: 
   _type: 3
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 688975091fcb1b546983ed4278afa48c, type: 3}
   id: 4

@@ -185,7 +185,7 @@ InputManager:
     m_Name: Cancel
     descriptiveName: 
     descriptiveNegativeName: 
-    negativeButton: 
+    negativeButton: mouse 1
     positiveButton: escape
     altNegativeButton: 
     altPositiveButton: joystick button 1

@@ -1,12 +1,15 @@
-
+using Core;
 using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 
 namespace Resources
 {
     public class Inventory
     {
         // List of resources
-        private List<Resource> _inventory;
+        // private List<Resource> _inventory;
+        private Dictionary<ResourceType, Resource> _inventory;
 
         // Keeping track of slots
         private int _usedInventorySlot;
@@ -17,29 +20,37 @@ namespace Resources
 
         public Inventory(int inventoryMaxSize)
         {
-            _inventory = new List<Resource>();
+            _inventory = new Dictionary<ResourceType, Resource>();
             _inventoryMaxSize = inventoryMaxSize;
             _usedInventorySlot = 0;
         }
 
+        public Inventory(int inventoryMaxSize, List<Resource> resources)
+        {
+            _inventory = new Dictionary<ResourceType, Resource>();
+            _inventoryMaxSize = inventoryMaxSize;
+            _usedInventorySlot = 0;
+
+            foreach(Resource resource in resources)
+            {
+                AddResource(resource);
+            }
+        }
+
+        // Mostly used for display on UI
         public List<Resource> GetInventory()
         {
-            return _inventory;
+            return _inventory.Values.ToList();
         }
 
-        public int GetUsedInventorySlot()
+        public (int, int) GetInventorySlot()
         {
-            return _usedInventorySlot;
+            return (_usedInventorySlot, _inventoryMaxSize);
         }
 
-        public int GetInventoryMaxSize()
+        public void IncreaseInventoryMaxSize(int increase)
         {
-            return _inventoryMaxSize;
-        }
-
-        public void SetInventoryMaxSize(int inventoryMaxSize)
-        {
-            _inventoryMaxSize = inventoryMaxSize;
+            _inventoryMaxSize += increase;
         }
 
         public void Reveal()
@@ -52,54 +63,104 @@ namespace Resources
             return _isRevealed;
         }
 
+        public bool Give1To(Inventory inventoryToGive, ResourceType type)
+        {
+            Resource resource = new Resource(type, 1);
+
+            // If the exchange can be done
+            if (CanRemoveResource(resource) && inventoryToGive.CanAddResource(resource))
+            {
+                // Apply to inventory
+                RemoveResource(resource);
+                inventoryToGive.AddResource(resource);
+                return true;
+            }
+            return false;
+        }
+
         public bool CanAddResource(Resource resource)
         {
             return resource.quantity + _usedInventorySlot <= _inventoryMaxSize;
         }
 
-        public void AddResource(Resource resource)
+        private void AddResource(Resource resource)
         {
             _usedInventorySlot += resource.quantity;
 
-            for (int i = 0; i < _inventory.Count; i++)
-            {
-                // If the resource already exist, add to its quantity
-                if (_inventory[i].type == resource.type)
-                {
-                    _inventory[i].quantity += resource.quantity;
-                    return;
-                }
-            }
+            bool exist = _inventory.ContainsKey(resource.type);
 
-            // If the resource don't exist already in inventory, add it
-            _inventory.Add(resource);
+            if (exist)
+                _inventory[resource.type].quantity += resource.quantity;
+            else
+                _inventory.Add(resource.type, resource);
         }
 
-        public bool CanRemoveResource(Resource resource)
+        private bool CanRemoveResource(Resource resource)
         {
-            for (int i = 0; i < _inventory.Count; i++)
-            {
-                if (_inventory[i].type == resource.type)
-                    return _inventory[i].quantity > 0;
-            }
-            return false;
+            return _inventory.ContainsKey(resource.type) && _inventory[resource.type].quantity >= resource.quantity;
         }
 
-        public void RemoveResource(Resource resource)
+        private void RemoveResource(Resource resource)
         {
             _usedInventorySlot -= resource.quantity;
 
-            for (int i = 0; i < _inventory.Count; i++)
+            if (_inventory[resource.type].quantity > resource.quantity)
+                _inventory[resource.type].quantity -= resource.quantity;
+            else
+                _inventory.Remove(resource.type);
+        }
+
+        public static Inventory ConcatInventories(Inventory inventory1, Inventory inventory2)
+        {
+            Inventory inventory = new Inventory(100000);
+
+            foreach (Resource resource in inventory1.GetInventory())
             {
-                if (_inventory[i].type == resource.type)
+                inventory.AddResource(resource);
+            }
+
+            foreach (Resource resource in inventory2.GetInventory())
+            {
+                inventory.AddResource(resource);
+            }
+            return inventory;
+        }
+
+        public bool CanPayCost(List<Resource> resources)
+        {
+            bool canPay = true;
+            foreach(Resource resource in resources)
+            {
+                canPay = CanRemoveResource(resource);
+
+                if (!canPay)
+                    break;
+            }
+            return canPay;
+        }
+
+        public List<Resource> PayCost(List<Resource> resources)
+        {
+            foreach(Resource resource in resources)
+            {
+                bool exist = _inventory.ContainsKey(resource.type);
+                if (exist)
                 {
-                    if (_inventory[i].quantity > resource.quantity)
-                        _inventory[i].quantity -= resource.quantity;
+                    int cost = _inventory[resource.type].quantity - resource.quantity;
+                    
+                    if (cost >= 0)
+                    {
+                        resources.Remove(resource);
+                        _inventory[resource.type].quantity -= resource.quantity;
+                    }
                     else
-                        _inventory.RemoveAt(i);
-                    return;
+                    {
+                        resource.quantity -= _inventory[resource.type].quantity;
+                        _inventory.Remove(resource.type);
+                    }
                 }
             }
+            return resources;
         }
     }
 }

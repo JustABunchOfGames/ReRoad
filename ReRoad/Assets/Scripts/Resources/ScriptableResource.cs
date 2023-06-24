@@ -2,33 +2,27 @@ using UnityEngine;
 
 namespace Resources
 {
-    [CreateAssetMenu(menuName ="Core/Resource/New")]
+    [CreateAssetMenu(menuName = "Resource/New")]
     public class ScriptableResource : ScriptableObject
     {
         [SerializeField] private ResourceType _type;
 
-        public GameObject icon;
-        public int id;
+        [SerializeField] private Sprite icon;
+        [SerializeField] private int id;
 
-        public bool IsOfType(ResourceType type)
+        public ResourceType GetResourceType()
         {
-            return _type == type;
+            return _type;
         }
 
-        public GameObject GetIcon(ResourceType type)
+        public Sprite GetIcon()
         {
-            if (_type == type)
-                return icon;
-
-            return null;
+            return icon;
         }
 
-        public int GetID(ResourceType type)
+        public int GetID()
         {
-            if (_type == type) 
-                return id;
-
-            return -1; 
+            return id;
         }
     }
 }

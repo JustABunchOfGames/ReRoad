@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: Electronic
   m_EditorClassIdentifier: 
   _type: 4
-  icon: {fileID: 0}
+  icon: {fileID: 21300000, guid: e23ece0d14fe584409f1c9a8ffaeee8c, type: 3}
   id: 5

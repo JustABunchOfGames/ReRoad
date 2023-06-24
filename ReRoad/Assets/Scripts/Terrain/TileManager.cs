@@ -55,7 +55,7 @@ namespace Terrain
             }
 
             // Say we have finished the initialization
-            _stateManager.ChangeState();
+            GameStateManager.ChangeState();
         }
 
         private void RegisterTile(Tile tile)
@@ -76,9 +76,7 @@ namespace Terrain
 
         private void AddRessourcesToTile(Tile tile)
         {
-            tile.inventory = new Inventory(_baseInventorySizeForTiles);
-            foreach(Resource resource in _ressourcesList.GetRessourcesByTileType(tile.GetTileType()))
-                tile.inventory.AddResource(resource);
+            tile.inventory = new Inventory(_baseInventorySizeForTiles, _ressourcesList.GetRessourcesByTileType(tile.GetTileType()));
         }
 
         private List<Tile> GetNeighbours(Tile tile)
@@ -133,6 +131,13 @@ namespace Terrain
         public Tile GetSelectedTile()
         {
             return _selectedTile;
+        }
+
+        public void CancelSelectTile()
+        {
+            _highlightedTile = null;
+            _highlight.gameObject.SetActive(false);
+            _selector.gameObject.SetActive(false);
         }
 
         // For player to spawn on a random tile a the start of the game
