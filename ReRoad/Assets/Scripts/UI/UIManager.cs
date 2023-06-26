@@ -1,4 +1,5 @@
 using Core;
+using Player;
 using System.Collections;
 using UnityEngine;
 
@@ -6,11 +7,8 @@ namespace UI
 {
     public class UIManager : MonoBehaviour
     {
-        private GameState _currentGameState;
-        private GameState _savedGameState = GameState.WaitingPlayer;
-
         [Header("Player")]
-        [SerializeField] private Player.Player _player;
+        [SerializeField] private PlayerData _player;
 
         [Header("UI")]
         [SerializeField] private SurvivalUI _survivalUI;
@@ -36,72 +34,72 @@ namespace UI
             _inventoryUI.UpdateInventory();
 
             _buildingUI.Setup(_player);
+
+            GameStateManager.ChangeState();
         }
 
-        private void Update()
+        public void SelectingMove(int actionPointUsed)
         {
-            _currentGameState = GameStateManager.GetState();
+            // Hide all possible action
+            _actionBarUI.DeactivateAll();
 
-            // Setup not finished
-            if (_currentGameState < GameState.WaitingPlayer)
-                return;
+            // Show the actionPoint that would be used
+            _actionPointUI.ShowActionPointUsedByMovement(true, actionPointUsed);
+        }
 
-            // If an action just ended, update needed
-            if (_currentGameState == GameState.WaitingPlayer && _savedGameState != _currentGameState)
-            {
-                // Hide preview
-                _actionPointUI.ShowActionPointUsedByMovement(false, 0);
+        public void CancelSelectingMove()
+        {
+            // Show every possible action
+            UpdateActionBar();
 
-                // Update actionPoint if the action used some
-                _actionPointUI.UpdateActionPoint(_player.GetUsedActionPoint());
+            // Hide UI
+            _actionPointUI.ShowActionPointUsedByMovement(false, 0);
+        }
 
-                // Show every possible action
-                UpdateActionBar();
+        public void Moving()
+        {
+            // Hide preview
+            _actionPointUI.ShowActionPointUsedByMovement(false, 0);
 
-                // Update SurvivalStatus changed by the action
-                _survivalUI.UpdateSurvivalStatus(_player.GetSurvivalStatus());
-
-                // Update Inventories
-                _inventoryUI.UpdateInventory();
-            }
-
-            // Player selecting the tile to move on
-            if (_currentGameState == GameState.SelectingMove)
-            {
-                // Hide all possible action
-                _actionBarUI.DeactivateAll();
-
-                // Show the actionPoint that would be used
-                _actionPointUI.ShowActionPointUsedByMovement(true, _player.move.GetActionPointPreview());
-            }
-
-            // Player currently moving
-            if (_currentGameState == GameState.Moving)
-            {
-                // Hide preview
-                _actionPointUI.ShowActionPointUsedByMovement(false, 0);
-
-                // Update actionPoint used during movement
-                _actionPointUI.UpdateActionPoint(_player.GetUsedActionPoint());
+            // Update actionPoint used during movement
+            _actionPointUI.UpdateActionPoint(_player.GetUsedActionPoint());
 
 
-                // Update SurvivalStatus changed by the movement
-                _survivalUI.UpdateSurvivalStatus(_player.GetSurvivalStatus());
+            // Update SurvivalStatus changed by the movement
+            _survivalUI.UpdateSurvivalStatus(_player.GetSurvivalStatus());
 
-                // Update Inventories
-                _inventoryUI.UpdateInventory();
-            }
+            // Update Inventories
+            _inventoryUI.UpdateInventory();
+        }
 
-            // Player asked to build, we propose it
-            if (_currentGameState == GameState.Build && _savedGameState != _currentGameState)
-            {
-                _buildingUI.ProposeToBuild();
+        public void LastMove()
+        {
+            Moving();
 
-                // Hide all possible action
-                _actionBarUI.DeactivateAll();
-            }
+            // Show every possible action
+            UpdateActionBar();
+        }
 
-            _savedGameState = _currentGameState;
+        public void Harvest()
+        {
+            // Update actionPoint used during movement
+            _actionPointUI.UpdateActionPoint(_player.GetUsedActionPoint());
+
+
+            // Update SurvivalStatus changed by the movement
+            _survivalUI.UpdateSurvivalStatus(_player.GetSurvivalStatus());
+
+            // Update Inventories
+            _inventoryUI.UpdateInventory();
+
+            // Show every possible action
+            UpdateActionBar();
+        }
+
+        public void UpdateInventory()
+        {
+            // Update Inventories
+            _inventoryUI.UpdateInventory();
         }
 
         private void UpdateActionBar()

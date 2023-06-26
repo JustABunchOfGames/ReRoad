@@ -20,7 +20,7 @@ namespace Core
     public class GameStateManager : MonoBehaviour
     {
         // Beginning with the map setup
-        [SerializeField] private static GameState _state = GameState.TileSetup;
+        private static GameState _state = GameState.TileSetup;
 
         // If it's called with blank, just reset the state
         // If it's called with a state, set it

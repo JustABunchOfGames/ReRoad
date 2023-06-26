@@ -17,9 +17,6 @@ namespace Terrain
         private Tile _highlightedTile;
         private Tile _selectedTile;
 
-        [Header("Manager")]
-        [SerializeField] private GameStateManager _stateManager;
-
         [Header("RessourcesListForTiles")]
         [SerializeField] private ScriptableRessourcesByTileType _ressourcesList;
         [SerializeField] private int _baseInventorySizeForTiles = 20;
@@ -107,8 +104,6 @@ namespace Terrain
         // ISelectable from Tile
         public void OnHighlightTile(Tile tile)
         {
-            _selectedTile = null;
-
             _highlight.gameObject.SetActive(true);
             _highlight.transform.position = tile.transform.position;
             _highlightedTile = tile;
@@ -133,9 +128,10 @@ namespace Terrain
             return _selectedTile;
         }
 
-        public void CancelSelectTile()
+        public void StopSelectingTile()
         {
             _highlightedTile = null;
+            _selectedTile = null;
             _highlight.gameObject.SetActive(false);
             _selector.gameObject.SetActive(false);
         }

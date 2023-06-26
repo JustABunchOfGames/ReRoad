@@ -6,24 +6,14 @@ namespace Core
     {
         [SerializeField] private Camera _camera;
 
-        // To stop raycasting when we selected a Tile, no need to continue to move the indicator
-        private bool _stopRaycasting;
+        // Selecting in progress
+        private bool _isSelecting;
 
         private void Update()
         {
-            // Reset the bool when the player stopped doing what it did
-            if (_stopRaycasting && GameStateManager.GetState() == GameState.WaitingPlayer)
-                _stopRaycasting = false;
-
-            // Cancel Raycasting
-            if (Input.GetButtonDown("Cancel"))
-            {
-                _stopRaycasting = true;
-                GameStateManager.ChangeState();
-            }
 
             // Indicate to the tile we're on that it's highlighted / selected
-            if (!_stopRaycasting && GameStateManager.GetState() == GameState.SelectingMove)
+            if (_isSelecting)
             {
                 RaycastHit hit;
                 Ray ray = _camera.ScreenPointToRay(Input.mousePosition);
@@ -33,16 +23,30 @@ namespace Core
                     ISelectable selectable = hit.collider.GetComponent<ISelectable>();
                     if (selectable != null)
                     {
+                        // Say to the tile it is highlighted
                         selectable.OnHighlight();
 
                         if (Input.GetButtonDown("Select"))
                         {
+                            // Say to the tile it is selected
                             selectable.OnSelect();
-                            _stopRaycasting = true;
+                            
+                            // Finished selecting
+                            _isSelecting = false;
                         }
                     }
                 }
             }
+        }
+
+        public void StartRaycast()
+        {
+            _isSelecting = true;
+        }
+
+        public void StopRaycast()
+        {
+            _isSelecting = false;
         }
     }
 }

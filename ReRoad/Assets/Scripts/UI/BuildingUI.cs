@@ -3,12 +3,13 @@ using Core;
 using Resources;
 using System.Collections.Generic;
 using UnityEngine;
+using Player;
 
 namespace UI 
 {
     public class BuildingUI : MonoBehaviour
     {
-        private Player.Player _player;
+        private PlayerData _player;
 
         [SerializeField] private ScriptableBuildCost _scriptableBuildCost;
 
@@ -18,7 +19,7 @@ namespace UI
         [TextArea]
         [SerializeField] private string _textForOutpost;
 
-        public void Setup(Player.Player player)
+        public void Setup(PlayerData player)
         {
             _player = player;
         }

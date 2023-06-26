@@ -12,9 +12,9 @@ namespace UI
         [Header("TileInventory")]
         [SerializeField] private InventoryDisplay _displayedTileResources;
 
-        private Player.Player _player;
+        private Player.PlayerData _player;
 
-        public void Setup(Player.Player player)
+        public void Setup(Player.PlayerData player)
         {
             _player = player;
         }
@@ -30,26 +30,6 @@ namespace UI
             _displayedTileResources.gameObject.SetActive(_player.currentTile.inventory.isRevealed());
 
             _displayedTileResources.UpdateDisplay(_player.currentTile.inventory);
-        }
-
-        // Called from ExchangeResource, on buttons
-        public bool Give1Resource(bool playerToTile, ResourceType type)
-        {
-            bool isExchangeOk = false;
-
-            if (playerToTile)
-            {
-                isExchangeOk = _player.inventory.Give1To(_player.currentTile.inventory, type);
-            }
-            else
-            {
-                isExchangeOk = _player.currentTile.inventory.Give1To(_player.inventory, type);
-            }
-
-            if (isExchangeOk)
-                UpdateInventory();
-
-            return isExchangeOk;
         }
     }
 }
